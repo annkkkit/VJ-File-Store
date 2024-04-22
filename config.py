@@ -1,80 +1,73 @@
+import re
 import os
-import logging
-from logging.handlers import RotatingFileHandler
+from os import getenv, environ
+from Script import script 
+from dotenv import load_dotenv
 
+load_dotenv()
 
+id_pattern = re.compile(r'^.\d+$')
+def is_enabled(value, default):
+    if value.lower() in ["true", "yes", "1", "enable", "y"]:
+        return True
+    elif value.lower() in ["false", "no", "0", "disable", "n"]:
+        return False
+    else:
+        return default
+      
+# Owner Information
+API_ID = int(environ.get("API_ID", "29392490"))
+API_HASH = environ.get("API_HASH", "665dca499707831e9e40ff1efde65471")
+ADMINS = int(environ.get("ADMINS", "6408243526"))
 
-#Bot token @Botfather
-TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
+# Database Information
+CLONE_DB_URI = environ.get("CLONE_DB_URI", "")
+CDB_NAME = environ.get("CDB_NAME", "clonevjbotz")
+DB_URI = environ.get("DB_URI", "mongodb+srv://ankitanand047:54mmvqonulPMOoaO@ankit.ttpgqwd.mongodb.net/?retryWrites=true&w=majority&appName=Ankit")
+DB_NAME = environ.get("DB_NAME", "vjbotz")
 
-#Your API ID from my.telegram.org
-APP_ID = int(os.environ.get("APP_ID", "29392490"))
+# Bot Information
+BOT_TOKEN = environ.get("BOT_TOKEN", "")
+BOT_USERNAME = environ.get("BOT_USERNAME", "filesxobot") # your bot username without @
+PICS = (environ.get('PICS', 'https://graph.org/file/82ef767ffebe3a948e476.jpg https://graph.org/file/82ef767ffebe3a948e476.jpg')).split() # Bot Start Picture
 
-#Your API Hash from my.telegram.org
-API_HASH = os.environ.get("API_HASH", "665dca499707831e9e40ff1efde65471")
+# Auto Delete Information
+AUTO_DELETE = int(environ.get("AUTO_DELETE", "30")) # Time in Minutes
+AUTO_DELETE_TIME = int(environ.get("AUTO_DELETE_TIME", "1800")) # Time in Seconds
 
-#Your db channel Id
-CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002045441186"))
+# Channel Information
+LOG_CHANNEL = int(environ.get("LOG_CHANNEL", "-1002045441186"))
+FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '-1002038684640')).split()]
 
-#OWNER ID
-OWNER_ID = int(os.environ.get("OWNER_ID", "6408243526"))
+# File Caption Information
+CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", f"{script.CAPTION}")
+BATCH_FILE_CAPTION = environ.get("BATCH_FILE_CAPTION", CUSTOM_FILE_CAPTION)
 
-#Port
-PORT = os.environ.get("PORT", "8080")
+# Enable - True or Disable - False
+PROTECT_CONTENT = is_enabled((environ.get('PROTECT_CONTENT', "False")), False)
+PUBLIC_FILE_STORE = is_enabled((environ.get('PUBLIC_FILE_STORE', "True")), True)
 
-#Database 
-DB_URI = os.environ.get("DATABASE_URL", "mongodb+srv://ankitanand047:54mmvqonulPMOoaO@ankit.ttpgqwd.mongodb.net/?retryWrites=true&w=majority&appName=Ankit")
-DB_NAME = os.environ.get("DATABASE_NAME", "filesharexbot")
-
-#force sub channel id, if you want enable force sub
-FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", "0"))
-
-TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
-
-#start message
-START_MSG = os.environ.get("START_MESSAGE", "Hello {first}\n\nI can store private files in Specified Channel and other users can access it from special link.")
-try:
-    ADMINS=[]
-    for x in (os.environ.get("ADMINS", "").split()):
-        ADMINS.append(int(x))
-except ValueError:
-        raise Exception("Your Admins list does not contain valid integers.")
-
-#Force sub message 
-FORCE_MSG = os.environ.get("FORCE_SUB_MESSAGE", "Hello {first}\n\n<b>You need to join in my Channel/Group to use me\n\nKindly Please join Channel</b>")
-
-#set your Custom Caption here, Keep None for Disable Custom Caption
-CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", None)
-
-#set True if you want to prevent users from forwarding files from bot
-PROTECT_CONTENT = True if os.environ.get('PROTECT_CONTENT', "False") == "True" else False
-
-#Set true if you want Disable your Channel Posts Share button
-DISABLE_CHANNEL_BUTTON = os.environ.get("DISABLE_CHANNEL_BUTTON", None) == 'True'
-
-BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
-USER_REPLY_TEXT = "❌Don't send me messages directly I'm only File Share bot!"
-
-ADMINS.append(OWNER_ID)
-ADMINS.append(1250450587)
-
-LOG_FILE_NAME = "filesharingbot.txt"
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s - %(levelname)s] - %(name)s - %(message)s",
-    datefmt='%d-%b-%y %H:%M:%S',
-    handlers=[
-        RotatingFileHandler(
-            LOG_FILE_NAME,
-            maxBytes=50000000,
-            backupCount=10
-        ),
-        logging.StreamHandler()
-    ]
-)
-logging.getLogger("pyrogram").setLevel(logging.WARNING)
-
-
-def LOGGER(name: str) -> logging.Logger:
-    return logging.getLogger(name)
+# File Stream Config
+class Var(object):
+    MULTI_CLIENT = False
+    name = str(getenv('name', 'filetolinkvjbot'))
+    SLEEP_THRESHOLD = hint(getenv('SLEEP_THRESHOLD', '60'))
+    WORKERS = int(getenv('WORKERS', '4'))
+    BIN_CHANNEL = int(getenv('BIN_CHANNEL', '-1002045441186'))
+    PORT = int(getenv('PORT', 8080))
+    BIND_ADRESS = str(getenv('WEB_SERVER_BIND_ADDRESS', '0.0.0.0'))
+    PING_INTERVAL = int(environ.get("PING_INTERVAL", "1200"))  # 20 minutes
+    NO_PORT = bool(getenv('NO_PORT', False))
+    APP_NAME = None
+    if 'DYNO' in environ:
+        ON_HEROKU = True
+        APP_NAME = str(getenv('APP_NAME'))
+    
+    else:
+        ON_HEROKU = False
+    FQDN = str(getenv('FQDN', BIND_ADRESS)) if not ON_HEROKU or getenv('FQDN') else APP_NAME+'.herokuapp.com'
+    HAS_SSL=bool(getenv('HAS_SSL',False))
+    if HAS_SSL:
+        URL = "https://ankit-ctyv.onrender.com"
+    else:
+        URL = "https://ankit-ctyv.onrender.com"
